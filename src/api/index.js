@@ -7,3 +7,7 @@ export const getArticles = (query) => {
 export const getClickLog = (query) => {
   return request.post("/api/admin/getLickLog", query);
 };
+
+export const getReptile = (query) => {
+  return request.post("/api/admin/getReptile", query);
+};

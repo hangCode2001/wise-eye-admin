@@ -3,14 +3,14 @@
     <div class="crumbs">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item>
-          <i class="el-icon-lx-cascades"></i> 用户管理
+          <i class="el-icon-lx-cascades"></i> 新闻管理
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="container">
       <div class="handle-box">
         <el-button type="primary" @click="handleSearch"
-          >拉取用户点击信息</el-button
+          >获取今日爬取的新闻</el-button
         >
       </div>
 
@@ -24,35 +24,51 @@
       >
         <el-table-column
           prop="date"
-          label="点击日期"
+          label="发布日期"
           sortable
           :sort-method="sortMethod"
         >
           <template #default="scope">
             {{
-              dayjs(scope.row.click_timestamp).format("YYYY-MM-DD HH:mm:ss")
+              dayjs(scope.row.created_at_ts).format("YYYY-MM-DD HH:mm:ss")
             }}</template
           >
         </el-table-column>
         <el-table-column
-          prop="user_id"
-          label="用户id"
+          prop="article_id"
+          label="ID"
           width="55"
           align="center"
         ></el-table-column>
-
-        <el-table-column label="文章标题">
-          <template #default="scope"
-            ><div class="title">{{ scope.row.title }}</div></template
-          >
-        </el-table-column>
         <el-table-column
-          prop="click_article_id"
-          label="文章id"
+          prop="category_id"
+          label="类别"
           width="100px"
           :filters="typeList"
           :filter-method="filterTag"
         >
+          <template #default="scope"
+            ><el-tag :type="'success'">{{
+              categoryList[scope.row.category_id]
+            }}</el-tag></template
+          >
+        </el-table-column>
+        <el-table-column label="标题">
+          <template #default="scope"
+            ><div class="title">{{ scope.row.title }}</div></template
+          >
+        </el-table-column>
+        <el-table-column label="正文">
+          <template #default="scope"
+            ><div class="content" style="white-space: nowrap">
+              {{ scope.row.content }}
+            </div></template
+          >
+        </el-table-column>
+        <el-table-column label="正文长度">
+          <template #default="scope"
+            ><div class="title">{{ scope.row.words_count }}</div></template
+          >
         </el-table-column>
       </el-table>
       <div class="pagination">
@@ -66,6 +82,24 @@
         ></el-pagination>
       </div>
     </div>
+
+    <!-- 编辑弹出框 -->
+    <el-dialog title="编辑" v-model="editVisible" width="30%">
+      <el-form label-width="70px">
+        <el-form-item label="用户名">
+          <el-input v-model="form.name"></el-input>
+        </el-form-item>
+        <el-form-item label="地址">
+          <el-input v-model="form.address"></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="editVisible = false">取 消</el-button>
+          <el-button type="primary" @click="saveEdit">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -73,7 +107,7 @@
 import { ref, reactive, computed, watch } from "vue";
 import dayjs from "dayjs";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { getClickLog } from "../api/index";
+import { getReptile } from "../api/index";
 import { categoryList } from "../const/index";
 
 // 类别筛选
@@ -101,7 +135,7 @@ function getTableHooks() {
   // 获取表格数据
   const getData = () => {
     loading.value = true;
-    getClickLog(query).then((res) => {
+    getReptile().then((res) => {
       tableData.value = res.list;
       pageTotal.value = res.page_total || 50;
       loading.value = false;
@@ -117,7 +151,7 @@ function getTableHooks() {
   const handlePageChange = (val) => {
     query.offset = (val - 1) * 10;
     currentPage.value = val;
-    getData();
+    // getData();
   };
   return [
     query,

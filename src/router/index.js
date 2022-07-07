@@ -27,7 +27,7 @@ const routes = [
           title: "用户管理",
         },
         component: () =>
-          import(/* webpackChunkName: "users" */ "../pages/users.vue"),
+          import(/* webpackChunkName: "users" */ "../pages/Users.vue"),
       },
       {
         path: "/articles",
@@ -37,6 +37,15 @@ const routes = [
         },
         component: () =>
           import(/* webpackChunkName: "Articles" */ "../pages/Articles.vue"),
+      },
+      {
+        path: "/reptile",
+        name: "reptile",
+        meta: {
+          title: "爬虫获取",
+        },
+        component: () =>
+          import(/* webpackChunkName: "Articles" */ "../pages/Reptile.vue"),
       },
       {
         path: "/table",
